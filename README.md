@@ -16,7 +16,7 @@ A simple Python script to find the country of a given international phone number
 
 ## Installation
 
-### **1. Clone the Repository**
+### **1. Clone the Repository Linux**
 ```bash
 git clone https://github.com/PanagiotisMavro/country-phone-lookup.git
 cd country-phone-lookup
