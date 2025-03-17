@@ -7,6 +7,13 @@ A simple Python script to find the country of a given international phone number
 - Returns the corresponding country code (e.g., `US` for the United States).
 - Supports the `--help` option for guidance.
 
+## If Problem for pip? Can help you 
+-sudo apt install python3-venv
+-python3 -m venv ~/myenv
+-source ~/myenv/bin/activate
+-pip3 install phonenumbers
+(Working)
+
 ## Installation
 
 ### **1. Clone the Repository**
