@@ -1,0 +1,9 @@
+
+---
+
+### **5. Push to GitHub**
+Run these commands in your project folder:
+```bash
+git add .
+git commit -m "Initial commit: Added country lookup script and README"
+git push origin main
