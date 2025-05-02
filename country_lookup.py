@@ -1,40 +1,69 @@
 #!/usr/bin/env python3
 import sys
 import phonenumbers
+from phonenumbers import geocoder, carrier, timezone
 from phonenumbers.phonenumberutil import region_code_for_number
+import pycountry
+from geopy.geocoders import Nominatim
 
-def get_country(phone_number):
-    """Find the country of a given phone number."""
+def get_coordinates(location):
+    geolocator = Nominatim(user_agent="phone_locator")
+    try:
+        loc = geolocator.geocode(location)
+        if loc:
+            return (loc.latitude, loc.longitude)
+    except:
+        return None
+    return None
+
+def main(phone_number):
     try:
         number = phonenumbers.parse(phone_number, None)
-        country = region_code_for_number(number)
-        if country:
-            print(f"Country: {country}")
+        international = phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+        local = phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.NATIONAL).replace(" ", "")
+        region_code = region_code_for_number(number)
+        country_name = pycountry.countries.get(alpha_2=region_code).name if region_code else "Unknown"
+        area = geocoder.description_for_number(number, "en")
+        isp = carrier.name_for_number(number, "en")
+        time_zones = timezone.time_zones_for_number(number)
+
+        # Try to geolocate the area
+        search_area = f"{area}, {country_name}" if area else country_name
+        coords = get_coordinates(search_area)
+
+        print("[I]INFO:[THIS MODULE ALLOWS YOU TO SEARCH INFORMATION ABOUT A PHONE NUMBERS SUCH AS CARRIER]\n")
+        print("[I]DATE-FORMAT:[EU:DD/MM/YYYY]\n")
+        print(f"[I]DELETING OLD {phone_number}.txt\n")
+        print(f"[+]SCANNING NUMBER: {phone_number}...\n")
+        print("[I]THIS IS PROBABLY A REAL PHONE NUMBER\n")
+        print(f"[v]INTERNATIONAL NUMBER: {international}")
+        print(f"[v]LOCAL NUMBER: {local}")
+        print(f"[v]COUNTRY PREFIX: +{number.country_code}")
+        print(f"[v]COUNTRY CODE: {region_code}")
+        print(f"[v]COUNTRY: {country_name}")
+        print(f"[v]AREA/ZONE: {area or country_name}")
+        print(f"[v]CARRIER/ISP: {isp or 'Unknown'}")
+        print(f"[v]TIMEZONE N°1: {time_zones[0] if time_zones else 'Unknown'}\n")
+
+        if coords:
+            lat, lon = coords
+            print("[v]AREA FOUND\n")
+            print(f"[+]CHECKING NUMBER {phone_number} APPROXIMATE GEOLOCATION")
+            print(f"[v]LATITUDE: {lat}")
+            print(f"[v]LONGITUDE: {lon}")
+            print(f"[v]GOOGLE MAPS LINK: https://www.google.com/maps/place/{lat},{lon}")
+            print(f"[I]MAP SAVED ON: GUI/Reports/Phone/{phone_number}/Area_GeoLocation.html\n")
         else:
-            print("Country not found.")
+            print("[!] GEOLOCATION NOT FOUND")
+
+        print(f"[+]PHONE NUMBER COUNTRY:{country_name}\n")
+        print(f"[+]SEARCHING PHONE NUMBER {phone_number} ON DIFFERENT SITES")
+
     except phonenumbers.NumberParseException:
-        print("Invalid phone number format.")
-
-def print_help():
-    """Display help information."""
-    help_text = """
-Usage: country_lookup [PHONE_NUMBER]
-
-Find the country associated with a given phone number.
-
-Arguments:
-  PHONE_NUMBER    A phone number in international format (e.g., +30xxxxxxxxx)
-
-Options:
-  --help          Show this help message and exit.
-
-Example:
-  country_lookup +14155552671  # Returns country code (e.g., 'US')
-"""
-    print(help_text)
+        print("[!] ERROR: Invalid phone number format.")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2 or sys.argv[1] in ["--help", "-h"]:
-        print_help()
-    else:
-        get_country(sys.argv[1])
+    if len(sys.argv) != 2:
+        print("Usage: python3 country1.py +[countrycode][number]")
+        sys.exit(1)
+    main(sys.argv[1])
