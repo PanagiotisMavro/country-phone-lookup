@@ -12,6 +12,7 @@ A simple Python script to find the country of a given international phone number
 - python3 -m venv ~/myenv
 - source ~/myenv/bin/activate
 - pip3 install phonenumbers
+- pip3 install pycountry
 
 
 ## Installation
